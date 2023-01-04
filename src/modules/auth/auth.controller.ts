@@ -12,9 +12,9 @@ import {
 import { UsersService } from '../users/users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from '../users/shemas/user.shema';
-import { SignUpGuard } from './guards/signUp.guard';
+import { RegisterGuard } from './guards/register.guard';
 import { LoginUserDto } from './dto/login-user.dto';
-import { SignInGuard } from './guards/signIn.guard';
+import { LoginGuard } from './guards/login.guard';
 import { AuthService } from './auth.service';
 
 @Controller('auth')
@@ -24,21 +24,23 @@ export class AuthController {
     private authService: AuthService,
   ) {}
 
-  @Post('signup')
+  @Post('reg')
   @HttpCode(HttpStatus.CREATED)
-  @UseGuards(SignUpGuard)
-  async signUp(@Body() createUserDto: CreateUserDto): Promise<User> {
-    return this.userService.signUp(createUserDto);
+  @UseGuards(RegisterGuard)
+  async register(@Body() createUserDto: CreateUserDto): Promise<User> {
+    return this.userService.register(createUserDto);
   }
 
-  @Post('signIn')
+  @Post('login')
   @HttpCode(HttpStatus.OK)
-  @UseGuards(SignInGuard)
-  async signIn(@Body() loginUserDto: LoginUserDto) {
-    const user = await this.userService.signIn(loginUserDto);
+  @UseGuards(LoginGuard)
+  async login(@Body() loginUserDto: LoginUserDto) {
+    const user = await this.userService.login(loginUserDto);
 
     const access = await this.authService.generateAccessToken(user);
     const refresh = await this.authService.generateRefreshToken(user.userId);
+
+    user.password = undefined;
 
     return {
       ...access,
@@ -47,9 +49,9 @@ export class AuthController {
     };
   }
 
-  @Post('signOut')
+  @Post('logout')
   @HttpCode(HttpStatus.CREATED)
-  signOut() {}
+  logout() {}
 
   @Get('activate/:link')
   activate(@Param('link') link: string) {}

@@ -1,16 +1,15 @@
 import {
-  Injectable,
   CanActivate,
   ExecutionContext,
+  Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { AuthService } from '../auth.service';
 import { UsersService } from '../../users/users.service';
-import bcrypt from 'bcrypt';
 
 @Injectable()
-export class SignInGuard implements CanActivate {
+export class LoginGuard implements CanActivate {
   constructor(
     private authService: AuthService,
     private userService: UsersService,
@@ -25,10 +24,9 @@ export class SignInGuard implements CanActivate {
 
     const { phone, password } = request.body;
 
-    const user = await this.userService.findOne(phone);
-    const hashPassword = await bcrypt.hash(password, 3);
+    const match = await this.authService.validatePassword(phone, password);
 
-    if (!user || user.password !== hashPassword) {
+    if (!match) {
       throw new UnauthorizedException(`phone number or password is incorrect`);
     }
     return true;

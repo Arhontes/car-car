@@ -3,6 +3,7 @@ import { UsersService } from '../users/users.service';
 import { User } from '../users/shemas/user.shema';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './constans';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -40,5 +41,36 @@ export class AuthService {
       return null;
     }
     return user;
+  }
+
+  async validatePassword(
+    phone: string,
+    password: string,
+  ): Promise<boolean | null> {
+    const user = await this.usersService.findOne(phone);
+    if (!user) {
+      return null;
+    }
+    return await bcrypt.compare(password, user.password);
+  }
+
+  parseJwt(token) {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(function (c) {
+          return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join(''),
+    );
+
+    return JSON.parse(jsonPayload);
+  }
+
+  async getUserByTokenData(token: string): Promise<any> {
+    const parsedTokenData = this.parseJwt(token);
+    return await this.usersService.findOne(parsedTokenData.user.phone);
   }
 }

@@ -10,24 +10,26 @@ import * as bcrypt from 'bcrypt';
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-  async signUp(createUserDto: CreateUserDto): Promise<User | null> {
-    const existingUser = await this.userModel.findOne({
-      phone: createUserDto.phone,
-    });
+  async register(createUserDto: CreateUserDto): Promise<User | null> {
+    const existingUser = await this.findOne(createUserDto.phone);
 
     if (existingUser) {
       return null;
     }
     const passwordHash = await bcrypt.hash(createUserDto.password, 3);
 
-    const user: CreateUserDto = { ...createUserDto, password: passwordHash };
+    const newUser: CreateUserDto = { ...createUserDto, password: passwordHash };
 
-    const createdUser = new this.userModel(user);
+    const createdUser = new this.userModel(newUser);
 
-    return createdUser.save();
+    await createdUser.save();
+
+    createdUser.password = undefined;
+
+    return createdUser;
   }
 
-  async signIn(loginUserDto: LoginUserDto): Promise<User | null> {
+  async login(loginUserDto: LoginUserDto): Promise<User | null> {
     const user = await this.userModel.findOne({
       phone: loginUserDto.phone,
     });
@@ -36,10 +38,11 @@ export class UsersService {
       return null;
     }
 
+    user.password = undefined;
     return user;
   }
 
   async findOne(phone: string): Promise<User> {
-    return this.userModel.findOne({ phone });
+    return this.userModel.findOne({ phone }).exec();
   }
 }
