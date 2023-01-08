@@ -5,5 +5,5 @@ export class LoginUserDto {
   readonly password: string;
 
   @IsNotEmpty()
-  readonly phone: string;
+  readonly email: string;
 }

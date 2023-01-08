@@ -44,10 +44,10 @@ export class AuthService {
   }
 
   async validatePassword(
-    phone: string,
+    email: string,
     password: string,
   ): Promise<boolean | null> {
-    const user = await this.usersService.findOne(phone);
+    const user = await this.usersService.findOne(email);
     if (!user) {
       return null;
     }

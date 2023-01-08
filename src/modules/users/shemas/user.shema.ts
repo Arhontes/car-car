@@ -12,7 +12,7 @@ export class User {
   @Prop({ unique: true, type: String, required: true, default: uuidv4() })
   userId;
 
-  @Prop({ type: String, required: true })
+  @Prop({ unique: true, type: String, required: true })
   email;
 
   @Prop({ type: String, required: true })
@@ -25,9 +25,9 @@ export class User {
   activationLink;
 
   @Prop({ type: String, required: true })
-  username;
+  firstName;
 
-  @Prop({ type: String, required: false })
+  @Prop({ type: String, required: true })
   lastName;
 
   @Prop({ type: Boolean, default: false })

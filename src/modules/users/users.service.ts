@@ -31,7 +31,7 @@ export class UsersService {
 
   async login(loginUserDto: LoginUserDto): Promise<User | null> {
     const user = await this.userModel.findOne({
-      phone: loginUserDto.phone,
+      email: loginUserDto.email,
     });
 
     if (!user) {
@@ -42,7 +42,7 @@ export class UsersService {
     return user;
   }
 
-  async findOne(phone: string): Promise<User> {
-    return this.userModel.findOne({ phone }).exec();
+  async findOne(email: string): Promise<User> {
+    return this.userModel.findOne({ email }).exec();
   }
 }

@@ -22,9 +22,9 @@ export class LoginGuard implements CanActivate {
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
 
-    const { phone, password } = request.body;
+    const { email, password } = request.body;
 
-    const match = await this.authService.validatePassword(phone, password);
+    const match = await this.authService.validatePassword(email, password);
 
     if (!match) {
       throw new UnauthorizedException(`phone number or password is incorrect`);
