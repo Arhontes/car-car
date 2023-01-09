@@ -1,7 +1,7 @@
 import {
-  Injectable,
   CanActivate,
   ExecutionContext,
+  Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
@@ -18,13 +18,13 @@ export class RegisterGuard implements CanActivate {
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
 
-    const { phone } = request.body;
+    const { phone, email } = request.body;
 
-    const user = await this.authService.validateUser(phone);
+    const user = await this.authService.validateUser({ phone, email });
 
     if (user) {
       throw new UnauthorizedException(
-        `This phone number: ${phone} is already registered`,
+        `This phone number: ${phone} or ${email} is already registered`,
       );
     }
     return true;

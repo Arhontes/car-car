@@ -1,7 +1,7 @@
 import {
-  Injectable,
   CanActivate,
   ExecutionContext,
+  Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
@@ -23,13 +23,15 @@ export class RefreshJWTGuard implements CanActivate {
       throw new UnauthorizedException('Поле refresh_token обязательно');
     }
     if (!phone) {
-      throw new UnauthorizedException('Поле username обязательно');
+      throw new UnauthorizedException(`Поле phone обязательно`);
     }
 
-    const user = await this.authService.validateUser(phone);
+    const user = await this.authService.validateUser({ phone });
 
     if (!user) {
-      throw new UnauthorizedException('Пользователя не существует');
+      throw new UnauthorizedException(
+        'Пользователя c таким именем не существует',
+      );
     }
     return true;
   }
