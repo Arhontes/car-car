@@ -1,17 +1,21 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from './shemas/user.shema';
 import { Model } from 'mongoose';
 import { CreateUserDto } from '../auth/dto/create-user.dto';
 import { LoginUserDto } from '../auth/dto/login-user.dto';
 import * as bcrypt from 'bcrypt';
+import { ValidationUserType } from '../../common/types/validation-types';
+import { UserResponseType } from '../../common/types/users-types';
 
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
   async register(createUserDto: CreateUserDto): Promise<User | null> {
-    const existingUser = await this.findOne(createUserDto.phone);
+    const { phone, email } = createUserDto;
+
+    const existingUser = await this.findOne({ phone, email });
 
     if (existingUser) {
       return null;
@@ -38,11 +42,26 @@ export class UsersService {
       return null;
     }
 
-    user.password = undefined;
     return user;
   }
 
-  async findOne(email: string): Promise<User> {
-    return this.userModel.findOne({ email }).exec();
+  async findOne(data: ValidationUserType): Promise<User> {
+    return this.userModel.findOne({ ...data }).exec();
+  }
+
+  prepareUserAsResponse({
+    email,
+    userId,
+    phone,
+    firstName,
+    lastName,
+  }: User): UserResponseType {
+    return {
+      email,
+      userId,
+      phone,
+      firstName,
+      lastName,
+    };
   }
 }
