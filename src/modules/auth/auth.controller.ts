@@ -6,8 +6,11 @@ import {
   HttpStatus,
   Param,
   Post,
+  Req,
   Res,
   UseGuards,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -18,8 +21,11 @@ import { LoginGuard } from './guards/login.guard';
 import { AuthService } from './auth.service';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RefreshJWTGuard } from './guards/refresh-jwt.guard';
+import { UserResponseType } from '../../common/types/users-types';
+import { JwtGuard } from './guards/jwt.guard';
 
 @Controller('auth')
+@UsePipes(new ValidationPipe({ transform: true }))
 export class AuthController {
   constructor(
     private readonly userService: UsersService,
@@ -42,13 +48,24 @@ export class AuthController {
     const access = await this.authService.generateAccessToken(user);
     const refresh = await this.authService.generateRefreshToken(user.userId);
 
-    user.password = undefined;
+    const userAsResponse = this.userService.prepareUserAsResponse(user);
 
     return {
       ...access,
       ...refresh,
-      user,
+      user: { ...userAsResponse },
     };
+  }
+
+  @Get('me')
+  @HttpCode(HttpStatus.FOUND)
+  @UseGuards(JwtGuard)
+  async authMe(@Req() req): Promise<UserResponseType> {
+    const token = req.token;
+
+    const user = await this.authService.getUserByTokenData(token);
+
+    return this.userService.prepareUserAsResponse(user);
   }
 
   @Post('logout')
@@ -65,7 +82,9 @@ export class AuthController {
       refreshTokenDto.refresh_token,
     );
 
-    const user = await this.userService.findOne(refreshTokenDto.phone);
+    const user = await this.userService.findOne({
+      phone: refreshTokenDto.phone,
+    });
 
     const access = await this.authService.generateAccessToken(user);
 
