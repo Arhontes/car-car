@@ -4,6 +4,7 @@ import { User } from '../users/shemas/user.shema';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './constans';
 import * as bcrypt from 'bcrypt';
+import { ValidationUserType } from '../../common/types/validation-types';
 
 @Injectable()
 export class AuthService {
@@ -35,8 +36,8 @@ export class AuthService {
     }
   }
 
-  async validateUser(phone: string): Promise<User | null> {
-    const user = await this.usersService.findOne(phone);
+  async validateUser(data: ValidationUserType): Promise<User | null> {
+    const user = await this.usersService.findOne(data);
     if (!user) {
       return null;
     }
@@ -47,7 +48,7 @@ export class AuthService {
     email: string,
     password: string,
   ): Promise<boolean | null> {
-    const user = await this.usersService.findOne(email);
+    const user = await this.usersService.findOne({ email });
     if (!user) {
       return null;
     }
@@ -69,8 +70,11 @@ export class AuthService {
     return JSON.parse(jsonPayload);
   }
 
-  async getUserByTokenData(token: string): Promise<any> {
+  async getUserByTokenData(token: string): Promise<User> {
     const parsedTokenData = this.parseJwt(token);
-    return await this.usersService.findOne(parsedTokenData.user.phone);
+    return await this.usersService.findOne({
+      phone: parsedTokenData.user.phone,
+      email: parsedTokenData.user.email,
+    });
   }
 }
