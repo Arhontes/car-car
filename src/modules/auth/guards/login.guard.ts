@@ -6,14 +6,10 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { AuthService } from '../auth.service';
-import { UsersService } from '../../users/users.service';
 
 @Injectable()
 export class LoginGuard implements CanActivate {
-  constructor(
-    private authService: AuthService,
-    private userService: UsersService,
-  ) {}
+  constructor(private authService: AuthService) {}
 
   async canActivate(
     context: ExecutionContext,
