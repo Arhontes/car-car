@@ -47,7 +47,7 @@ export class ProductsController {
     const user = await this.authService.getUserByTokenData(token);
 
     //Done
-    return user.username;
+    return user;
 
     // return this.productsService.create(createProductDto);
   }

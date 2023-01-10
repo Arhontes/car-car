@@ -28,8 +28,6 @@ export class UsersService {
 
     await createdUser.save();
 
-    createdUser.password = undefined;
-
     return createdUser;
   }
 
