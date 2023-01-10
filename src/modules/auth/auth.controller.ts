@@ -14,7 +14,6 @@ import {
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { CreateUserDto } from './dto/create-user.dto';
-import { User } from '../users/shemas/user.shema';
 import { RegisterGuard } from './guards/register.guard';
 import { LoginUserDto } from './dto/login-user.dto';
 import { LoginGuard } from './guards/login.guard';
@@ -35,25 +34,39 @@ export class AuthController {
   @Post('reg')
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(RegisterGuard)
-  async register(@Body() createUserDto: CreateUserDto): Promise<User> {
-    return this.userService.register(createUserDto);
+  async register(
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<UserResponseType> {
+    const user = await this.userService.register(createUserDto);
+
+    return this.userService.prepareUserAsResponse(user);
   }
 
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @UseGuards(LoginGuard)
-  async login(@Body() loginUserDto: LoginUserDto) {
+  async login(
+    @Res({ passthrough: true }) res,
+    @Body() loginUserDto: LoginUserDto,
+  ) {
     const user = await this.userService.login(loginUserDto);
 
     const access = await this.authService.generateAccessToken(user);
     const refresh = await this.authService.generateRefreshToken(user.userId);
 
+    const date = new Date();
+    date.setTime(date.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+    res.cookie('token', refresh.refresh_token, {
+      httpOnly: true,
+      expires: date,
+    });
+
     const userAsResponse = this.userService.prepareUserAsResponse(user);
 
     return {
       ...access,
-      ...refresh,
-      user: { ...userAsResponse },
+      userAsResponse,
     };
   }
 
@@ -77,14 +90,19 @@ export class AuthController {
 
   @UseGuards(RefreshJWTGuard)
   @Post('refresh')
-  async refreshToken(@Body() refreshTokenDto: RefreshTokenDto, @Res() res) {
-    const validToken = await this.authService.verifyToken(
-      refreshTokenDto.refresh_token,
-    );
+  @HttpCode(HttpStatus.OK)
+  async refreshToken(
+    @Body() refreshTokenDto: RefreshTokenDto,
+    @Req() req,
+    @Res({ passthrough: true }) res,
+  ) {
+    const validToken = await this.authService.verifyToken(req.cookies['token']);
 
     const user = await this.userService.findOne({
       phone: refreshTokenDto.phone,
     });
+
+    const userAsResponse = this.userService.prepareUserAsResponse(user);
 
     const access = await this.authService.generateAccessToken(user);
 
@@ -94,18 +112,25 @@ export class AuthController {
           user.userId,
         );
 
+        const date = new Date();
+        date.setTime(date.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+        res.cookie('token', refresh.refresh_token, {
+          httpOnly: true,
+          expires: date,
+        });
+
         res.statusCode = HttpStatus.OK;
-        return res.send({ ...access, ...refresh });
+        return res.send({ ...access, userAsResponse });
       } else {
         res.statusCode = HttpStatus.BAD_REQUEST;
         return res.send({ error: validToken.error });
       }
     } else {
-      res.statusCode = HttpStatus.OK;
-      return res.send({
+      return {
         ...access,
-        refresh_token: refreshTokenDto.refresh_token,
-      });
+        user: userAsResponse,
+      };
     }
   }
 }
