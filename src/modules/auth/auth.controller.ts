@@ -18,10 +18,8 @@ import { RegisterGuard } from './guards/register.guard';
 import { LoginUserDto } from './dto/login-user.dto';
 import { LoginGuard } from './guards/login.guard';
 import { AuthService } from './auth.service';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RefreshJWTGuard } from './guards/refresh-jwt.guard';
 import { UserResponseType } from '../../common/types/users-types';
-import { JwtGuard } from './guards/jwt.guard';
 
 @Controller('auth')
 @UsePipes(new ValidationPipe({ transform: true }))
@@ -70,7 +68,7 @@ export class AuthController {
     };
   }
 
-  @Get('me')
+  /* @Get('me')
   @HttpCode(HttpStatus.FOUND)
   @UseGuards(JwtGuard)
   async authMe(@Req() req): Promise<UserResponseType> {
@@ -79,7 +77,7 @@ export class AuthController {
     const user = await this.authService.getUserByTokenData(token);
 
     return this.userService.prepareUserAsResponse(user);
-  }
+  }*/
 
   @Post('logout')
   @HttpCode(HttpStatus.CREATED)
@@ -91,46 +89,28 @@ export class AuthController {
   @UseGuards(RefreshJWTGuard)
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
-  async refreshToken(
-    @Body() refreshTokenDto: RefreshTokenDto,
-    @Req() req,
-    @Res({ passthrough: true }) res,
-  ) {
-    const validToken = await this.authService.verifyToken(req.cookies['token']);
-
-    const user = await this.userService.findOne({
-      phone: refreshTokenDto.phone,
-    });
+  async refreshToken(@Req() req, @Res({ passthrough: true }) res) {
+    const user = await this.userService.findOne({ userId: req.userId });
 
     const userAsResponse = this.userService.prepareUserAsResponse(user);
 
     const access = await this.authService.generateAccessToken(user);
 
-    if (validToken?.error) {
-      if (validToken.error === 'jwt expired') {
-        const refresh = await this.authService.generateRefreshToken(
-          user.userId,
-        );
+    const refresh = await this.authService.generateRefreshToken(user.userId);
 
-        const date = new Date();
-        date.setTime(date.getTime() + 30 * 24 * 60 * 60 * 1000);
+    if (!req.isFreshToken) {
+      const date = new Date();
+      date.setTime(date.getTime() + 30 * 24 * 60 * 60 * 1000);
 
-        res.cookie('token', refresh.refresh_token, {
-          httpOnly: true,
-          expires: date,
-        });
-
-        res.statusCode = HttpStatus.OK;
-        return res.send({ ...access, userAsResponse });
-      } else {
-        res.statusCode = HttpStatus.BAD_REQUEST;
-        return res.send({ error: validToken.error });
-      }
-    } else {
-      return {
-        ...access,
-        user: userAsResponse,
-      };
+      res.cookie('token', refresh.refresh_token, {
+        httpOnly: true,
+        expires: date,
+      });
     }
+
+    return {
+      ...access,
+      user: userAsResponse,
+    };
   }
 }
