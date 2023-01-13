@@ -80,8 +80,13 @@ export class AuthController {
   }*/
 
   @Post('logout')
-  @HttpCode(HttpStatus.CREATED)
-  logout() {}
+  @HttpCode(HttpStatus.OK)
+  logout(@Res({ passthrough: true }) res) {
+    res.cookie('token', '', {
+      httpOnly: true,
+      expires: new Date(new Date().getTime() - 24 * 60 * 60 * 1000),
+    });
+  }
 
   @Get('activate/:link')
   activate(@Param('link') link: string) {}
