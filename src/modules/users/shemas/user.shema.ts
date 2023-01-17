@@ -9,7 +9,7 @@ export class User {
   @Prop({ unique: true, type: String, required: true })
   phone;
 
-  @Prop({ unique: true, type: String, required: true, default: uuidv4() })
+  @Prop({ unique: true, type: String, required: true, default: () => uuidv4() })
   userId;
 
   @Prop({ unique: true, type: String, required: true })

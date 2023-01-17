@@ -6,6 +6,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import * as dotenv from 'dotenv';
 import { UsersModule } from '../users/users.module';
 import { AuthModule } from '../auth/auth.module';
+import { TripModule } from '../trip/trip.module';
 
 dotenv.config();
 
@@ -17,6 +18,7 @@ const mongoURI = `mongodb+srv://${process.env.DATABASE_USER}:${process.env.DATAB
     ProductsModule,
     UsersModule,
     AuthModule,
+    TripModule,
   ],
   controllers: [AppController],
   providers: [AppService],
