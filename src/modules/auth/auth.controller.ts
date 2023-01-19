@@ -64,7 +64,7 @@ export class AuthController {
 
     return {
       ...access,
-      userAsResponse,
+      user: { ...userAsResponse },
     };
   }
 
