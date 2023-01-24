@@ -9,6 +9,12 @@ export class Passenger {
   @Prop({ type: String, required: true })
   phone;
 
+  @Prop({ type: String, unique: true, required: true, default: () => uuidv4() })
+  passengerId;
+
+  @Prop({ type: String, required: true })
+  tripId;
+
   @Prop({ type: String, required: true, default: () => uuidv4() })
   userId;
 
@@ -30,7 +36,7 @@ export class Passenger {
   @Prop({ type: Boolean, default: false })
   approved;
 
-  @Prop({ type: String, default: '0', required: false })
+  @Prop({ type: String, default: '15', required: false })
   reservedTime;
 }
 

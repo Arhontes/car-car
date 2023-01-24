@@ -13,14 +13,24 @@ import { TripService } from './trip.service';
 import { CreateTripDto } from './dto/create-trip.dto';
 import { TripsSearchEntities } from './dto/trips-search-entities';
 import { UpdateTripDto } from './dto/update-trip.dto';
+import { PassengersService } from '../passengers/passengers.service';
 
 @Controller('trip')
 export class TripController {
-  constructor(private readonly tripService: TripService) {}
+  constructor(
+    private readonly tripService: TripService,
+    private readonly passengersService: PassengersService,
+  ) {}
 
   @Get(':tripId')
-  getOne(@Param('tripId') tripId: string): Promise<Trip> {
-    return this.tripService.getById(tripId);
+  async getOne(@Param('tripId') tripId: string): Promise<Trip> {
+    const passengers = await this.passengersService.findAllPassengersByTripId(
+      tripId,
+    );
+    const trip = await this.tripService.getById(tripId);
+
+    trip.passengers = passengers;
+    return trip;
   }
   @Delete(':tripId')
   deleteOne(@Param('tripId') tripId: string): Promise<Trip> {
