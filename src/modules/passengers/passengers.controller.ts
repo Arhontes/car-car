@@ -1,8 +1,18 @@
-import { Body, Controller, Delete, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { PassengersService } from './passengers.service';
 import { CreatePassengerDto } from './dto/create-passenger.dto';
 import { Passenger } from './shemas/passenger.shema';
 import { UpdatePassengerDto } from './dto/update-passenger.dto';
+import { PassengersSearchEntities } from './dto/passengers-search-entities';
 
 @Controller('passengers')
 export class PassengersController {
@@ -16,6 +26,16 @@ export class PassengersController {
   deleteOne(@Param('tripId') tripId: string): Promise<Trip> {
     return this.passengersService.remove(tripId);
   }*/
+  @Get(':passengerId')
+  async getOne(@Param('passengerId') passengerId: string): Promise<Passenger> {
+    return await this.passengersService.getPassengerByPassengerId(passengerId);
+  }
+  @Get()
+  async findPassengers(
+    @Query() query: PassengersSearchEntities,
+  ): Promise<Passenger[]> {
+    return await this.passengersService.findPassengers(query);
+  }
   @Post()
   async addPassenger(
     @Body() createPassengerDto: CreatePassengerDto,

@@ -14,6 +14,7 @@ import { CreateTripDto } from './dto/create-trip.dto';
 import { TripsSearchEntities } from './dto/trips-search-entities';
 import { UpdateTripDto } from './dto/update-trip.dto';
 import { PassengersService } from '../passengers/passengers.service';
+import { PassengersSearchEntities } from '../passengers/dto/passengers-search-entities';
 
 @Controller('trip')
 export class TripController {
@@ -24,9 +25,9 @@ export class TripController {
 
   @Get(':tripId')
   async getOne(@Param('tripId') tripId: string): Promise<Trip> {
-    const passengers = await this.passengersService.findAllPassengersByTripId(
+    const passengers = await this.passengersService.findPassengers({
       tripId,
-    );
+    } as PassengersSearchEntities);
     const trip = await this.tripService.getById(tripId);
 
     trip.passengers = passengers;

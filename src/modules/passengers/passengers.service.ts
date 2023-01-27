@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { Passenger, PassengerDocument } from './shemas/passenger.shema';
 import { CreatePassengerDto } from './dto/create-passenger.dto';
 import { UpdatePassengerDto } from './dto/update-passenger.dto';
+import { PassengersSearchEntities } from './dto/passengers-search-entities';
 
 @Injectable()
 export class PassengersService {
@@ -17,8 +18,8 @@ export class PassengersService {
   }
 
   async addPassenger(passengerDto: CreatePassengerDto): Promise<Passenger> {
-    const newTrip = new this.passengerModel(passengerDto);
-    return newTrip.save();
+    const newPassengers = new this.passengerModel(passengerDto);
+    return newPassengers.save();
   }
 
   async removeByPassengerId(passengerId): Promise<Passenger> {
@@ -29,10 +30,9 @@ export class PassengersService {
     return this.passengerModel.findOneAndRemove({ tripId });
   }
 
-  async findAllPassengersByTripId(tripId: string): Promise<Passenger[]> {
-    return this.passengerModel.find({ tripId });
+  async findPassengers(query: PassengersSearchEntities): Promise<Passenger[]> {
+    return this.passengerModel.find({ ...query });
   }
-
   async update(
     passengerId,
     updatePassengerDto: UpdatePassengerDto,

@@ -21,6 +21,9 @@ export class Passenger {
   @Prop({ type: String, required: true })
   email;
 
+  @Prop({ type: Number, required: true })
+  date;
+
   @Prop({ type: String, required: true })
   from;
 
