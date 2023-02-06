@@ -18,14 +18,6 @@ import { PassengersSearchEntities } from './dto/passengers-search-entities';
 export class PassengersController {
   constructor(private readonly passengersService: PassengersService) {}
 
-  /*@Get(':passenger')
-  async getOne(@Param('tripId') tripId: string): Promise<Trip> {
-    return await this.passengersService.getById(tripId);
-  }
-  @Delete(':tripId')
-  deleteOne(@Param('tripId') tripId: string): Promise<Trip> {
-    return this.passengersService.remove(tripId);
-  }*/
   @Get(':passengerId')
   async getOne(@Param('passengerId') passengerId: string): Promise<Passenger> {
     return await this.passengersService.getPassengerByPassengerId(passengerId);
