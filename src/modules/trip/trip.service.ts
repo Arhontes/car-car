@@ -28,8 +28,10 @@ export class TripService {
   }
 
   async update(tripId: string, updateTripDto: UpdateTripDto) {
-    return this.tripModel.findOneAndUpdate({ tripId }, updateTripDto, {
-      new: true,
-    });
+    return await this.tripModel
+      .findOneAndUpdate({ tripId }, updateTripDto, {
+        new: true,
+      })
+      .exec();
   }
 }
