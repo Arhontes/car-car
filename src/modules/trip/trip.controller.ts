@@ -34,14 +34,15 @@ export class TripController {
     return trip;
   }
   @Delete(':tripId')
-  deleteOne(@Param('tripId') tripId: string): Promise<Trip> {
-    return this.tripService.remove(tripId);
+  async deleteOne(@Param('tripId') tripId: string): Promise<Trip> {
+    const trip = await this.tripService.remove(tripId);
+    await this.passengersService.removeAllByTripId(tripId);
+
+    return trip;
   }
   @Post()
   async createOne(@Body() createTripDto: CreateTripDto): Promise<Trip> {
-    const trip = await this.tripService.create(createTripDto);
-
-    return trip;
+    return await this.tripService.create(createTripDto);
   }
   @Get()
   async find(@Query() query: TripsSearchEntities): Promise<Trip[]> {

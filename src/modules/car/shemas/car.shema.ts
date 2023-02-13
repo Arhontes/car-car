@@ -6,7 +6,7 @@ export type CarDocument = Car & Document;
 
 @Schema()
 export class Car {
-  @Prop({ type: String, default: uuidv4(), required: true })
+  @Prop({ type: String, default: () => uuidv4(), required: true })
   carId;
 
   @Prop({ type: String, required: true })

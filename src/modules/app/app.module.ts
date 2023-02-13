@@ -8,6 +8,7 @@ import { UsersModule } from '../users/users.module';
 import { AuthModule } from '../auth/auth.module';
 import { TripModule } from '../trip/trip.module';
 import { PassengersModule } from '../passengers/passengers.module';
+import { CarsModule } from '../car/cars.module';
 
 dotenv.config();
 
@@ -21,6 +22,7 @@ const mongoURI = `mongodb+srv://${process.env.DATABASE_USER}:${process.env.DATAB
     AuthModule,
     TripModule,
     PassengersModule,
+    CarsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
