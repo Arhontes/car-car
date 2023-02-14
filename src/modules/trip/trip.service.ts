@@ -24,7 +24,7 @@ export class TripService {
   }
 
   async findTrips(query: TripsSearchEntities): Promise<Trip[]> {
-    return this.tripModel.find({ ...query });
+    return await this.tripModel.find(query).exec();
   }
 
   async update(tripId: string, updateTripDto: UpdateTripDto) {

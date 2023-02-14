@@ -7,4 +7,5 @@ export class CreatePassengerDto {
   readonly lastName: string;
   readonly tripId: string;
   readonly userId: string;
+  readonly date: number;
 }

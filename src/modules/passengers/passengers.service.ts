@@ -31,7 +31,7 @@ export class PassengersService {
   }
 
   async findPassengers(query: PassengersSearchEntities): Promise<Passenger[]> {
-    return this.passengerModel.find({ ...query });
+    return await this.passengerModel.find(query).exec();
   }
   async update(
     passengerId,
