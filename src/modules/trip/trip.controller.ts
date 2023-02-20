@@ -36,7 +36,7 @@ export class TripController {
   @Delete(':tripId')
   async deleteOne(@Param('tripId') tripId: string): Promise<Trip> {
     const trip = await this.tripService.remove(tripId);
-    await this.passengersService.removeAllByTripId(tripId);
+    const passengers = await this.passengersService.removeAllByTripId(tripId);
 
     return trip;
   }
