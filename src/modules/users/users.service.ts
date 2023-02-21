@@ -7,10 +7,19 @@ import { LoginUserDto } from '../auth/dto/login-user.dto';
 import * as bcrypt from 'bcrypt';
 import { ValidationUserType } from '../../common/types/validation-types';
 import { UserResponseType } from '../../common/types/users-types';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+
+  async update(userId, updateUserDto: UpdateUserDto): Promise<User> {
+    return await this.userModel
+      .findOneAndUpdate({ userId }, updateUserDto, {
+        new: true,
+      })
+      .exec();
+  }
 
   async register(createUserDto: CreateUserDto): Promise<User | null> {
     const { phone, email } = createUserDto;
