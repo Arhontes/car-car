@@ -7,11 +7,11 @@ const port = process.env.PORT || 5000;
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser());
-  /*app.enableCors({
+  app.enableCors({
     origin: "https://onega-go.vercel.app",
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true
-  });*/
+  });
   await app.listen(port);
 }
 
