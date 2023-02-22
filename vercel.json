@@ -10,7 +10,7 @@
     {
       "src": "/(.*)",
       "dest": "build/main.js",
-      "methods": [ "GET", "POST", "PUT", "PATCH", "DELETE","OPTIONS" ]
+      "methods": [ "GET", "POST", "PUT", "PATCH", "DELETE"]
     }
   ]
 }
