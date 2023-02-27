@@ -55,15 +55,16 @@ export class AuthController {
     const date = new Date();
     date.setTime(date.getTime() + 30 * 24 * 60 * 60 * 1000);
 
-    res.cookie('token', refresh.refresh_token, {
-      httpOnly: true,
-      expires: date,
-    });
+    // res.cookie('token', refresh.refresh_token, {
+    //   httpOnly: true,
+    //   expires: date,
+    // });
 
     const userAsResponse = this.userService.prepareUserAsResponse(user);
 
     return {
       ...access,
+      ...refresh,
       user: { ...userAsResponse },
     };
   }
@@ -103,18 +104,19 @@ export class AuthController {
 
     const refresh = await this.authService.generateRefreshToken(user.userId);
 
-    if (!req.isFreshToken) {
-      const date = new Date();
-      date.setTime(date.getTime() + 30 * 24 * 60 * 60 * 1000);
-
-      res.cookie('token', refresh.refresh_token, {
-        httpOnly: true,
-        expires: date,
-      });
-    }
+    // if (!req.isFreshToken) {
+    //   const date = new Date();
+    //   date.setTime(date.getTime() + 30 * 24 * 60 * 60 * 1000);
+    //
+    //   res.cookie('token', refresh.refresh_token, {
+    //     httpOnly: true,
+    //     expires: date,
+    //   });
+    // }
 
     return {
       ...access,
+      ...refresh,
       user: userAsResponse,
     };
   }
