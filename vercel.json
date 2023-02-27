@@ -1,16 +1,16 @@
 {
   "version": 2,
+  "name": "simple-express-app",
   "builds": [
     {
-      "src": "build/main.js",
+      "src": "src/index.ts",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "build/main.js",
-      "methods": [ "GET", "POST", "PUT", "PATCH", "DELETE"]
+      "dest": "src/index.ts"
     }
   ]
 }
