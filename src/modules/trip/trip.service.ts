@@ -16,6 +16,7 @@ export class TripService {
 
   async create(tripDto: CreateTripDto): Promise<Trip> {
     const newTrip = new this.tripModel(tripDto);
+    console.log(newTrip);
     return newTrip.save();
   }
 

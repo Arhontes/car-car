@@ -19,7 +19,7 @@ import { LoginUserDto } from './dto/login-user.dto';
 import { LoginGuard } from './guards/login.guard';
 import { AuthService } from './auth.service';
 import { RefreshJWTGuard } from './guards/refresh-jwt.guard';
-import { UserResponseType } from '../../common/types/users-types';
+import { AuthGeneratedType } from './dto/authGeneratedType';
 
 @Controller('auth')
 @UsePipes(new ValidationPipe({ transform: true }))
@@ -34,10 +34,19 @@ export class AuthController {
   @UseGuards(RegisterGuard)
   async register(
     @Body() createUserDto: CreateUserDto,
-  ): Promise<UserResponseType> {
+  ): Promise<AuthGeneratedType> {
     const user = await this.userService.register(createUserDto);
 
-    return this.userService.prepareUserAsResponse(user);
+    const access = await this.authService.generateAccessToken(user);
+    const refresh = await this.authService.generateRefreshToken(user.userId);
+
+    const userAsResponse = await this.userService.prepareUserAsResponse(user);
+
+    return {
+      ...access,
+      ...refresh,
+      user: { ...userAsResponse },
+    };
   }
 
   @Post('login')

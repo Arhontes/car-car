@@ -20,7 +20,6 @@ export class RefreshJWTGuard implements CanActivate {
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest();
     const token = request.headers.refresh;
-    console.log(token);
     // const token = request.cookies['token'];
     if (!token) {
       throw new UnauthorizedException('Поле refresh_token обязательно');
